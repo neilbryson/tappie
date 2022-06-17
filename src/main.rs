@@ -51,6 +51,13 @@ fn main() -> Result<(), io::Error> {
         }
 
         if should_quit {
+            disable_raw_mode()?;
+            execute!(
+                terminal.backend_mut(),
+                LeaveAlternateScreen,
+                DisableMouseCapture
+            )?;
+            terminal.show_cursor()?;
             return Ok(());
         }
     }
