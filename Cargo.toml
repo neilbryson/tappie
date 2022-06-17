@@ -9,6 +9,7 @@ authors = ["Neil Bryson Cargamento <neilbrysonmc@gmail.com"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1.0.57"
 clap = { version = "3.1", features = ["derive"] }
 crossterm = "0.23"
 tui = "0.18"
