@@ -1,3 +1,4 @@
+use crate::text_reader::{get_test_list, TestFileList};
 use crate::ui;
 use anyhow::Result;
 use crossterm::{
@@ -5,6 +6,7 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
+use std::collections::HashMap;
 use std::error::Error;
 use std::io;
 use std::time::{Duration, Instant};
@@ -16,8 +18,19 @@ pub enum AppState {
     TypingTest,
 }
 
+impl AppState {
+    pub fn get_title(&self) -> &str {
+        match self {
+            Self::MainMenu => "Main menu",
+            Self::TypingTest => "Typing test",
+            Self::Help => "Help",
+        }
+    }
+}
+
 pub struct App<'a> {
     pub current_state: AppState,
+    pub test_list: TestFileList,
     pub title: &'a str,
     pub should_quit: bool,
 }
@@ -26,6 +39,7 @@ impl<'a> App<'a> {
     pub fn new(title: &'a str) -> App<'a> {
         App {
             current_state: AppState::MainMenu,
+            test_list: HashMap::new(),
             title,
             should_quit: false,
         }
@@ -42,6 +56,8 @@ pub fn run() -> Result<(), Box<dyn Error>> {
     terminal.hide_cursor()?;
 
     let mut app = App::new("tappie");
+    let test_list = get_test_list();
+    app.test_list = test_list;
 
     let tick_rate = Duration::from_millis(100);
     let mut last_tick = Instant::now();

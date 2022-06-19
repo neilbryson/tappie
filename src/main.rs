@@ -1,5 +1,6 @@
 mod app;
 mod cli;
+mod text_reader;
 mod ui;
 
 use crate::app::run;

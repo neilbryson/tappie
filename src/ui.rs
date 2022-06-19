@@ -1,4 +1,5 @@
 use crate::app::App;
+use crate::text_reader::TestFileList;
 use tui::layout::Rect;
 use tui::style::{Color, Modifier};
 use tui::widgets::{Paragraph, Wrap};
@@ -7,7 +8,7 @@ use tui::{
     layout::{Constraint, Direction, Layout},
     style::Style,
     text::{Span, Spans},
-    widgets::{Block, Borders},
+    widgets::{Block, Borders, List, ListItem},
     Frame,
 };
 
@@ -45,12 +46,17 @@ where
     draw_help(f, layout[1]);
 }
 
-pub fn draw_status<B>(f: &mut Frame<B>, _app: &App, layout_rect: Rect)
+pub fn draw_status<B>(f: &mut Frame<B>, app: &App, layout_rect: Rect)
 where
     B: Backend,
 {
+    let text: Vec<Spans> = vec![Spans::from(vec![
+        Span::from("Current: "),
+        Span::from(app.current_state.get_title()),
+    ])];
     let block = Block::default().borders(Borders::ALL).title("tappie");
-    f.render_widget(block, layout_rect);
+    let paragraph = Paragraph::new(text).block(block);
+    f.render_widget(paragraph, layout_rect);
 }
 
 pub fn draw_help<B>(f: &mut Frame<B>, layout_rect: Rect)
@@ -82,12 +88,11 @@ where
     f.render_widget(paragraph, layout_rect);
 }
 
-pub fn draw_content_base<B>(f: &mut Frame<B>, _app: &App, layout_rect: Rect)
+pub fn draw_content_base<B>(f: &mut Frame<B>, app: &App, layout_rect: Rect)
 where
     B: Backend,
 {
-    let block = Block::default().borders(Borders::ALL);
-    f.render_widget(block, layout_rect);
+    draw_test_list(f, app, layout_rect);
 }
 
 pub fn draw_input_block<B>(f: &mut Frame<B>, layout_rect: Rect)
@@ -96,4 +101,19 @@ where
 {
     let block = Block::default().borders(Borders::ALL);
     f.render_widget(block, layout_rect);
+}
+
+pub fn draw_test_list<B>(f: &mut Frame<B>, app: &App, layout_rect: Rect)
+where
+    B: Backend,
+{
+    let mut list_items: Vec<ListItem> = Vec::new();
+    for (key, _) in &app.test_list {
+        let item_key = key.clone();
+        let list_item = ListItem::new(item_key);
+        list_items.push(list_item);
+    }
+    let block = Block::default().borders(Borders::ALL).title("Typing test");
+    let list = List::new(list_items).block(block).highlight_symbol(">> ");
+    f.render_widget(list, layout_rect);
 }
